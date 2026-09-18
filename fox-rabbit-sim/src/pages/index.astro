@@ -1,0 +1,28 @@
+---
+// The markup lives in src/app.html so that exactly one copy of it feeds both
+// builds: this Astro page and the zero-dependency bundler in tools/bundle.mjs.
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import '../styles.css';
+
+const body = fs.readFileSync(fileURLToPath(new URL('../app.html', import.meta.url)), 'utf8');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Rabbit &amp; Fox Game — BIMB265125</title>
+    <meta
+      name="description"
+      content="Interactive companion to the Rabbit & Fox table-top game, Bioengineering Practicum, Universitas Gadjah Mada."
+    />
+  </head>
+  <body>
+    <Fragment set:html={body} />
+    <script>
+      import '../ui.js';
+    </script>
+  </body>
+</html>

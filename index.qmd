@@ -1,0 +1,33 @@
+# Welcome {.unnumbered}
+
+**Bioengineering Practicum · BIMB265125** (T: 0 / P: 1 sks)
+Master's Programme in Biology, Faculty of Biology, Universitas Gadjah Mada
+Odd Semester 2026/2027
+
+Teaching team: Matin Nuhamunada, S.Si., M.Sc., Ph.D. (Coordinator) · Dr. Miftahul Ilmi, S.Si., M.Si.
+
+Practicum module (Colab notebooks, slides): <https://bimb265125.matinnu.org/>
+
+This site is the companion to the practicum's weekly sessions: a condensed
+version of each lecture deck plus the hands-on material for that week. It is
+being built up meeting by meeting, alongside the course — right now it covers
+the first two.
+
+| # | Date | Topic |
+|---|------|-------|
+| 1 | 11 September 2026 | [Introduction to Computational Applications in Bioengineering](meetings/m01-introduction.qmd) |
+| 2 | 18 September 2026 | [Modelling Biological Systems with Simple Differential Equations](meetings/m02-ode-models.qmd) |
+
+Meetings 3–10 will be added here as they happen.
+
+## Assessment
+
+| Component | Weight | When |
+|---|---|---|
+| Practicum performance | 20% | Every meeting |
+| Weekly journal / report | 30% | Before the next meeting |
+| Project | 25% | Meetings 7–10 |
+| Field visit report | 10% | After meeting 9 |
+| Presentation | 15% | Meeting 10 |
+
+There is no mid-term or final exam for the practicum.

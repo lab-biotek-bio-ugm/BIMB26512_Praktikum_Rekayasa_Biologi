@@ -1,0 +1,7 @@
+node_modules/
+dist-astro/
+.astro/
+.verify/
+.DS_Store
+*.log
+graphify-out/

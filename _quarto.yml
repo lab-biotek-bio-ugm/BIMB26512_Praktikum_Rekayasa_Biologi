@@ -1,0 +1,25 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Bioengineering Practicum · BIMB265125"
+  subtitle: "Companion site"
+  author: "Matin Nuhamunada, S.Si., M.Sc., Ph.D."
+  page-footer: "Universitas Gadjah Mada · Faculty of Biology · Master's Programme in Biology"
+  chapters:
+    - index.qmd
+    - meetings/m01-introduction.qmd
+    - meetings/m02-ode-models.qmd
+  page-navigation: true
+
+resources:
+  - P01_Introduction_to_Computational_Applications_in_Bioengineering.pptx
+  - P02_Modelling_Biological_Systems_with_Simple_Differential_Equations.pptx
+  - fox-rabbit-sim/dist/index.html
+  - M02_simple_ODE_models.ipynb
+
+format:
+  html:
+    theme:
+      light: [flatly, custom.scss]

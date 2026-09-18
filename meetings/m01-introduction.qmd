@@ -1,0 +1,201 @@
+# Meeting 1 · Introduction to Computational Applications in Bioengineering
+
+Friday, 11 September 2026 · 13.00–15.00 WIB
+[Download the slides (.pptx)](../P01_Introduction_to_Computational_Applications_in_Bioengineering.pptx)
+
+> A simulation is not magic. It is a set of rules applied over and over, one
+> small step at a time. Today you will be the computer.
+
+## Agenda
+
+| Block | What | Time |
+|---|---|---|
+| A | Why bioengineering needs computation — a systems biology primer | 13.00–13.35 |
+| B | From reaction networks to dynamics — the modelling toolkit | 13.35–14.00 |
+| C | Hands-on: the Rabbit & Fox game (no computers!) | 14.00–14.45 |
+| D | Your working environment: Colab, notebooks, data management | 14.45–15.00 |
+
+## Block A — Why bioengineering needs computation
+
+**Reductionism vs. systems biology.** Molecular biology takes a system apart
+and understands one module very well — powerful, and the source of almost
+everything we know. Systems biology puts the modules back together and
+studies their interactions: a metabolic network is not a list of enzymes, it
+is a web of couplings between them. The engineering consequence: to change
+what a cell makes, you have to reason about the whole network, not one gene.
+
+**The Ship of Theseus.** If every molecule in a cell is replaced over time, is
+it still the same cell? What persists is the *pattern of interactions*, not
+the stuff — and that pattern is what a model tries to capture (Kacser, 1957:
+"the properties of a system are in fact more than the sum of the properties
+of its components").
+
+**Where the numbers come from.** Omics data (genomics, transcriptomics,
+proteomics, metabolomics, fluxomics), high-throughput tech (NGS, LC/MS,
+robotic screening, automated cultivation — you'll meet the automation side in
+meetings 7–8 with Pioreactor), and biological databases (NCBI, UniProt, KEGG,
+MetaCyc, BiGG Models, BioModels). A model is only as good as the measurements
+behind it, and the bookkeeping that keeps those measurements findable.
+
+**Genome annotation vs. network annotation.** Genome annotation answers "what
+genetic material is present?" and produces a catalogue. Network annotation
+answers "what biochemical activity is possible?" and produces a *computable
+model*. Turning the first into the second is called reconstruction — the
+subject of meetings 4–6. A genome-scale metabolic model (GSMM) is a computable
+inventory of every reaction an organism can catalyse (typically 1 000–10 000
+reactions). It needs no kinetic constants, which is exactly why it scales to
+a whole organism, unlike the kinetic models built next week. Two companies
+that build GSMMs for a living: Novo Nordisk (via the Novo Nordisk Foundation,
+which funds DTU Biosustain, co-developers of COBRApy — used in meeting 4) and
+Novonesis.
+
+## Block B — From networks to dynamics
+
+A network diagram (nodes = things whose amounts change; links = the processes
+that change them) tells you what is *possible* — topology, motifs, hubs. Only
+a dynamic model tells you what actually *happens*: oscillation, bistability,
+adaptation. Three ways to turn a network into a model, in increasing realism
+(and required data): topology only → a stoichiometric matrix (meetings 4–6) →
+rate laws + parameters (meetings 2–3). More mechanism means more realism, and
+far more parameters to measure — that trade-off never goes away.
+
+**State variables** are what the system *is* right now (concentration,
+population, membrane potential) — what the ODE solves for. **Parameters** are
+what the system's *rules* are (rate constants, half-saturation, maximum
+rate) — fixed during a run. In the game: state variables are how many candies
+and sticky notes are on the grid; parameters are the rules on the rules card.
+
+A first-order ODE, `dx/dt = f(x)`, says: give me the state now, and the rule
+`f` tells me where it goes next — which is also a description of the game.
+Three named models to know:
+
+- **Linear birth–degradation** — steady state depends on the degradation
+  rate; half-life `t½ = ln 2 / k_deg`. Biological analogy: an mRNA
+  transcribed at a constant rate and degraded by RNases.
+- **Logistic growth** — steady states at `N = 0` (unstable) and `N = K`
+  (stable); growth is fast when `N ≪ K` and stalls as `N → K`. Analogy: a
+  bacterial culture in a flask. Today's grassland has exactly 36 cells — that
+  is `K`.
+- **Lotka–Volterra predator–prey** — `+αR` (prey breed), `−βRF` (prey die on
+  encounter), `+δRF` (predators breed from what they catch), `−γF`
+  (predators starve without prey). Today's model.
+
+When `solve_ivp(...)` draws a curve, it did not solve the equation on paper —
+it started from the given state, applied the rule to get the change over a
+small step, updated the state, and repeated, thousands of times. For the next
+45 minutes there are no computers: you are the processor, the candies are the
+state, and the rules card is the model.
+
+## Block C — The Rabbit & Fox game
+
+45 minutes, no computers. Candies are rabbits, sticky notes are foxes, and
+you are the numerical solver. (Adapted from the MnSTEP predator–prey
+activity, SERC, Carleton College.)
+
+**Per group of four:** a 6×6 grid (≈50×50 cm), 40 candies (rabbits), 12
+sticky notes (foxes, each covering a 2×2 patch), one tally sheet. One person
+scatters, one drops, one counts, one records — rotate every round. At most
+one candy per cell.
+
+**Version 1.** Start: 4 rabbits, 1 fox. Each generation: scatter the
+surviving rabbits at random, drop each fox's note (order matters — foxes are
+resolved one at a time), remove every rabbit caught, a fox that caught ≥3
+survives (otherwise it starves), every survivor doubles for the next
+generation. *What usually happens:* with only 4 rabbits on 36 cells, a fox
+almost never finds 3 in one patch — it starves immediately and nothing brings
+it back. Rabbits then double until the grid is full and stay there. Two
+state variables, one stuck at zero. Why: the meadow was sealed (nothing lets
+animals wander in), flat (no refuge anywhere), and extinction was absorbing
+(no way back from zero). A model fails when it leaves out a process that
+matters.
+
+**Version 2 — immigration.** If foxes hit 0 at the end of a turn, 1 fox
+wanders in; if rabbits hit 0, 3 rabbits wander in. Everything else unchanged.
+This is a constant supply from outside the system boundary — a `+k` term
+that doesn't depend on the state, and it's exactly what makes a system *open*
+rather than closed (Meeting 2).
+
+**Version 3 — a sanctuary.** Keep version 2's rule, and mark a 2×2 corner
+where rabbits may sit but foxes may not hunt. An 11%-of-the-grid refuge does
+not change the outcome by 11% — it changes the *kind* of behaviour: without
+one, prey/predator booms and crashes risk hitting zero forever; with one, a
+guaranteed floor of prey puts a floor under the predators' food supply, and
+the swings damp instead of crashing. (The same structure reappears in
+metabolic engineering as a bypass route guaranteeing a minimum flux to an
+essential pathway.)
+
+**Translating the game into the equation you'll meet next week:**
+
+| What you did on the grid | The term | Parameter |
+|---|---|---|
+| Surviving rabbits double | `+αR` | α ≈ 0.7 / generation |
+| A fox's note lands on rabbits | `−βRF` | β = chance of overlap |
+| A fox with ≥3 catches breeds | `+δRF` | δ = conversion efficiency |
+| A fox with <3 catches starves | `−γF` | γ = starvation rate |
+| The grid holds only 36 candies | `× (1 − R/K)` | K = 36 |
+| Animals wander in | `+k` (constant influx) | k = 1 fox, 3 rabbits |
+| The sanctuary corner | predation acts on `(R − R_safe)` | R_safe |
+
+Your game is Euler's method with `Δt` = one generation — the crudest possible
+solver. Too large a step doesn't just blur the answer; it can manufacture
+behaviour the model doesn't actually contain (you'll see this on screen next
+week). And every group, playing identical rules, got a different graph — not
+experimental error, but a property of the system when numbers are small and
+chance (where the note lands) is built in.
+
+### Play it yourself
+
+The simulation below plays the same three rule sets, one generation at a
+time, and draws the tally sheet and population graph as it goes.
+
+```{=html}
+<iframe src="../fox-rabbit-sim/dist/index.html" width="100%" height="950"
+        style="border:1px solid #ccc; border-radius:8px;" loading="lazy">
+</iframe>
+```
+
+## Block D — Your working environment
+
+**Reproducibility is the rule of the practicum.** A result you cannot re-run
+is not a result, it's an anecdote. In practice: every number in your report
+traces to a notebook cell, every notebook runs top to bottom on a fresh
+runtime with no manual steps, every input file is named for what it is and
+lives somewhere findable.
+
+**The toolchain** (all open source, runs in a browser, nothing to install
+today):
+
+| Tool | What it is | From meeting |
+|---|---|---|
+| Google Colab | A Jupyter notebook on Google's machines, in your browser | 1 |
+| Python + NumPy | The language and its array maths | 2 |
+| SciPy (`solve_ivp`) | Numerical integration of ODEs | 2 |
+| Matplotlib | Plots | 2 |
+| COBRApy | Constraint-based analysis of genome-scale models | 4 |
+| Escher | Interactive metabolic pathway maps | 5 |
+| Pioreactor | An open-source bench-top bioreactor | 7 |
+
+**A computational notebook** holds three things at once: the code that
+produced a result, the result itself, and your narrative for why. The
+classic failure is cells run out of order, which only works on your screen —
+the cure, and the test applied to every notebook you hand in, is *Runtime →
+Restart and run all* before you submit.
+
+**Data management:** one folder per student in Google Drive,
+`BIMB265125_<yourname>/M01_intro/{raw,notebooks,figures}` and so on per
+meeting, with a `journal.md`. `raw/` is read-only — write a new file if data
+must change. Name files so alphabetical sort is also sensible sort (e.g.
+`M02_fig01_closed_system.png`); no spaces, no `final_final_v3`.
+
+### Before next Friday (18 September)
+
+- Open [colab.research.google.com](https://colab.research.google.com), sign
+  in with your UGM account, confirm a new notebook runs.
+- Create `BIMB265125_<yourname>/M01_intro/` in your Drive.
+- Photograph your tally sheets into `M01_intro/raw/`.
+- Plot all three runs and write a 200-word reflection: which rule mattered
+  most, and why; one rule you'd add next, and what it would change.
+- Skim the practicum module at [bimb265125.matinnu.org](https://bimb265125.matinnu.org/).
+
+Next meeting: the law of mass action, writing ODEs from a reaction network,
+and open vs. closed systems.

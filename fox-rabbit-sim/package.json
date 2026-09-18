@@ -1,0 +1,19 @@
+{
+  "name": "fox-rabbit-sim",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive companion to the Rabbit & Fox table-top game — Bioengineering Practicum BIMB265125, Universitas Gadjah Mada",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "bundle": "node tools/bundle.mjs",
+    "parity": "node tools/parity.mjs 4000",
+    "parity:python": "python3 tools/parity_reference.py 4000"
+  },
+  "devDependencies": {
+    "astro": "^5.0.0"
+  }
+}

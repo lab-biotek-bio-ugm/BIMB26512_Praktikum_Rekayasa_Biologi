@@ -1,0 +1,165 @@
+<a class="skip" href="#board">Skip to the grassland</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <div>
+      <p class="eyebrow">Universitas Gadjah Mada · Faculty of Biology</p>
+      <h1>The Rabbit &amp; Fox Game</h1>
+    </div>
+  </div>
+  <p class="course">Bioengineering Practicum · BIMB265125 · Meeting 1</p>
+</header>
+
+<main>
+ <div class="col">
+  <!-- ------------------------------------------------------------- board -->
+  <section class="panel board-panel" id="board">
+    <div class="panel-head">
+      <h2>The grassland</h2>
+      <p class="phase" id="phase" aria-live="polite">Ready — press Step to play one generation</p>
+    </div>
+
+    <div class="board-wrap">
+      <svg id="grid" class="grid" viewBox="0 0 420 420" role="img"
+           aria-labelledby="grid-title grid-desc">
+        <title id="grid-title">The 6 by 6 grassland</title>
+        <desc id="grid-desc">Candies are rabbits; sticky notes are foxes. Live counts are
+          reported in the readout below and in the tally table.</desc>
+      </svg>
+
+      <ul class="legend board-legend">
+        <li><span class="swatch swatch-rabbit"></span>candy = rabbit</li>
+        <li><span class="swatch swatch-fox"></span>sticky note = fox (covers 2 × 2)</li>
+        <li><span class="swatch swatch-sanctuary"></span>sanctuary — no hunting</li>
+      </ul>
+    </div>
+
+    <dl class="readout">
+      <div><dt>Generation</dt><dd id="out-gen">0</dd></div>
+      <div class="is-rabbit"><dt>Rabbits</dt><dd id="out-rabbits">4</dd></div>
+      <div class="is-fox"><dt>Foxes</dt><dd id="out-foxes">1</dd></div>
+      <div><dt>Caught this turn</dt><dd id="out-caught">—</dd></div>
+    </dl>
+  </section>
+
+  <!-- ---------------------------------------------------------- controls -->
+  <section class="panel controls-panel">
+    <div class="panel-head"><h2>Rules</h2></div>
+
+    <div class="segmented" role="radiogroup" aria-label="Rule set">
+      <button type="button" role="radio" data-rules="v1" aria-checked="true">Version 1</button>
+      <button type="button" role="radio" data-rules="v2" aria-checked="false">+ immigration</button>
+      <button type="button" role="radio" data-rules="v3" aria-checked="false">+ sanctuary</button>
+    </div>
+
+    <div class="rules-card">
+      <p class="rules-name" id="rules-name">Version 1 — the starting rules</p>
+      <p class="rules-tagline" id="rules-tagline">A sealed meadow. Nothing comes in, nowhere is safe.</p>
+      <ol class="rules-list">
+        <li>Scatter the surviving rabbits at random, one per cell.</li>
+        <li>Drop each fox's sticky note. It covers a 2 × 2 patch.</li>
+        <li>Every rabbit under a note is eaten.</li>
+        <li>A fox that caught <strong>3 or more</strong> in that one drop survives; fewer and it starves.</li>
+        <li>Every survivor — rabbit or fox — doubles for the next generation.</li>
+      </ol>
+      <p class="rules-expect" id="rules-expect">The fox almost always starves in turn 1, and nothing brings it back.</p>
+    </div>
+
+    <div class="buttons">
+      <button type="button" id="btn-step" class="btn btn-primary">Step ▸</button>
+      <button type="button" id="btn-play" class="btn">Play</button>
+      <button type="button" id="btn-reset" class="btn btn-ghost">Reset</button>
+    </div>
+
+    <div class="field-row">
+      <label class="field">
+        <span>Speed</span>
+        <select id="speed">
+          <option value="1600">Slow</option>
+          <option value="900" selected>Normal</option>
+          <option value="380">Fast</option>
+          <option value="0">Instant</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Seed</span>
+        <span class="seed-group">
+          <input id="seed" type="number" min="1" max="999999" step="1" value="7" />
+          <button type="button" id="btn-dice" class="btn btn-ghost" title="New random seed">⟳</button>
+        </span>
+      </label>
+    </div>
+
+    <p class="hint">
+      Every run with the same seed is identical — that is what makes it reproducible.
+      Change the seed to see how differently the same rules can play out.
+    </p>
+  </section>
+ </div>
+
+ <div class="col">
+  <!-- ------------------------------------------------------------- chart -->
+  <section class="panel chart-panel">
+    <div class="panel-head">
+      <h2>Population over the generations</h2>
+      <label class="toggle">
+        <input type="checkbox" id="show-ode" />
+        <span>Show the differential-equation model</span>
+      </label>
+    </div>
+
+    <figure class="chart-figure">
+      <svg id="chart" class="chart" viewBox="0 0 760 340" role="img"
+           aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">Rabbit and fox counts by generation</title>
+        <desc id="chart-desc">The same numbers are listed in the tally table below.</desc>
+      </svg>
+      <div class="tooltip" id="tooltip" hidden></div>
+      <figcaption>
+        <ul class="legend">
+          <li><span class="swatch swatch-rabbit"></span>Rabbits</li>
+          <li><span class="swatch swatch-fox"></span>Foxes</li>
+          <li class="legend-ode" hidden><span class="swatch swatch-ode"></span>ODE model (logistic prey, K = 36)</li>
+        </ul>
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ------------------------------------------------------------- tally -->
+  <section class="panel tally-panel">
+    <div class="panel-head">
+      <h2>Tally sheet</h2>
+      <button type="button" id="btn-csv" class="btn btn-ghost">Download CSV</button>
+    </div>
+    <div class="table-scroll">
+      <table class="tally">
+        <caption class="sr-only">Generation by generation record of the run</caption>
+        <thead>
+          <tr>
+            <th scope="col">Gen</th>
+            <th scope="col">Rabbits at start</th>
+            <th scope="col">Rabbits caught</th>
+            <th scope="col">Foxes that ate ≥ 3</th>
+            <th scope="col">Rabbits next</th>
+            <th scope="col">Foxes next</th>
+          </tr>
+        </thead>
+        <tbody id="tally-body">
+          <tr class="empty"><td colspan="6">No generations played yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint" id="tally-note">
+      “Rabbits caught” is not a state variable — it is a <strong>flux</strong>: how much moved
+      from one pool to another during one step.
+    </p>
+  </section>
+ </div>
+</main>
+
+<footer class="sitefoot">
+  <p>Adapted from the MnSTEP predator–prey activity (SERC, Carleton College).
+     The rules, and the model behind the overlay, are the ones used in the Meeting 1 deck.</p>
+  <p class="sitefoot-brand">ugm.ac.id · Merakyat, Mandiri, Berkelanjutan</p>
+</footer>

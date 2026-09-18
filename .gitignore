@@ -1,0 +1,6 @@
+/_book/
+/.quarto/
+
+**/*.quarto_ipynb
+**/*.pptx
+**/*.docx

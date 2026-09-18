@@ -1,0 +1,183 @@
+# Meeting 2 · Modelling Biological Systems with Simple Differential Equations
+
+Friday, 18 September 2026 · 13.00–15.00 WIB
+[Download the slides (.pptx)](../P02_Modelling_Biological_Systems_with_Simple_Differential_Equations.pptx)
+
+## Recap — where we left off
+
+Last week you played a predator–prey game with candies and sticky notes.
+Four things came out of it:
+
+1. A simulation is a rule applied repeatedly, one step at a time.
+2. Predation depended on *encounters* — the chance a fox and a rabbit met.
+   That made the rate proportional to `R × F`.
+3. A sealed meadow behaved nothing like an open one — immigration changed
+   the model qualitatively, not just quantitatively.
+4. Your step was one whole generation; a computer takes much smaller steps.
+
+Today makes points 2, 3 and 4 precise.
+
+## Agenda
+
+| Block | What | Time |
+|---|---|---|
+| A | The law of mass action — from encounters to rate laws | 13.00–13.25 |
+| B | From a reaction network graph to a system of ODEs (pen and paper) | 13.25–14.00 |
+| C | Open versus closed reaction networks | 14.00–14.20 |
+| D | Hands-on: simulating both in Python, on Google Colab | 14.20–15.00 |
+
+## Block A — The law of mass action
+
+**From encounters to collisions.** In the game, a rabbit died when a sticky
+note landed on it: more rabbits → more caught per drop, more foxes → more
+caught per turn, so catches per turn ∝ `R × F`. In a test tube, a molecule of
+A reacts when it collides with a molecule of B: more A or more B means more
+collisions, so reaction rate ∝ `[A] × [B]`. Same mathematics, different
+reason for the motion — rabbits run, molecules diffuse.
+
+**Waage & Guldberg, 1864.** The rate of a reaction is proportional to the
+probability that the reactants collide, and that probability is proportional
+to their concentrations, each raised to the power of the number in which it
+enters the reaction (its molecularity). The commonest mistake in this course:
+the exponents equal the stoichiometric coefficients *only* for elementary
+(single-collision) reactions — an overall reaction as written in a textbook
+is usually not elementary, and its rate law must be measured, not read off
+the equation.
+
+Why a *product*, not a sum: doubling `[A]` alone doubles the rate; doubling
+both `[A]` and `[B]` quadruples it. A sum would only have doubled.
+
+| Reaction | Molecularity | Rate law | Example |
+|---|---|---|---|
+| `∅ → A` | zero order | `v = k` | |
+| `A → B` | first order | `v = k[A]` | |
+| `A + B → C` | second order | `v = k[A][B]` | |
+| `2A → B` | second order | `v = k[A]²` | dimerisation |
+
+Units are a free error check: `v` is always concentration per time, so `k`
+must supply whatever is missing.
+
+**Worked example.** `A + B ⇌ C`: forward `v₊ = k₁[A][B]`, reverse `v₋ =
+k₋₁[C]`, net `v = k₁[A][B] − k₋₁[C]`. At equilibrium `v = 0`, so `[C] /
+([A][B]) = k₁/k₋₁ = K_eq` — the equilibrium constant is not an extra piece of
+information, it's the ratio of the two rate constants. Thermodynamics and
+kinetics are the same statement, read two ways.
+
+## Block B — From a network graph to a system of ODEs
+
+A reaction network is a graph: nodes are species whose amounts change, edges
+are reactions, each edge carries one rate `v` written with mass action. The
+equation for a species is nothing but the bookkeeping of the arrows that
+touch its node.
+
+**The recipe, every time:**
+
+1. List the species — each gets an equation.
+2. List the reactions — each gets a rate `v` from mass action.
+3. For each species, add the rates of reactions that *produce* it and
+   subtract those that *consume* it.
+4. Multiply each rate by its stoichiometric coefficient.
+
+Write down every rate `v` first; only then start writing `d/dt`. Mixing the
+two steps is where almost every sign error comes from.
+
+**Example 1 — closed, reversible:** `A ⇌ B`, forward `v₁ = k₁[A]`, reverse
+`v₂ = k₂[B]`. The two right-hand sides are exact negatives, so
+`d([A]+[B])/dt = 0` — `[A]+[B]` is constant. That's a conservation relation:
+this two-variable system really has only one independent variable.
+
+**Example 2 — the same network, opened up:** add `v₀ = k₀` (constant
+influx). Now `[A]+[B]` is *not* constant.
+
+| | Closed (ex. 1) | Open (ex. 2) |
+|---|---|---|
+| `[A] + [B]` | constant | not constant |
+| Steady state | all net fluxes zero | fluxes constant, non-zero |
+| Name | equilibrium | steady state |
+| A living cell is… | | this one |
+
+**The stoichiometric matrix.** One column per reaction, one row per species;
+each entry is how many molecules that reaction makes (+) or consumes (−) for
+that species. Every model in this course reduces to this matrix. Remember
+this for meeting 4: a kinetic model solves `dx/dt = Sv(x)` for the
+concentrations `x`. Flux Balance Analysis *sets* `dx/dt = 0` and solves
+`Sv = 0` for the fluxes `v` — same matrix, different unknown.
+
+## Block C — Open versus closed reaction networks
+
+| | Closed → equilibrium | Open → steady state |
+|---|---|---|
+| Mass | conserved | flows in and out |
+| At rest | every net flux = 0 | fluxes constant, not zero |
+| Needs energy? | no | yes, continuously |
+| Example | a sealed flask; a puddle | a chemostat; a river; a cell |
+
+A cell at thermodynamic equilibrium is a dead cell — that's not a metaphor,
+it's the definition. Every living cell continuously takes up substrate across
+its boundary (the `k₀` terms), excretes product and waste (the `k₂` terms),
+and maintains concentrations far from equilibrium at a cost in ATP. This is
+why a genome-scale model has exchange reactions, and why its very first
+constraint is a bound on glucose uptake — exactly the bound you'll set in
+meeting 4.
+
+## Block D — Simulating it in Python
+
+**The five steps of any simulation**, and what last week's game called them:
+
+| Step | In code | In the game |
+|---|---|---|
+| 1. State variables | `y0 = [1.0, 0.0]` | how many candies/notes to start with |
+| 2. Parameters | `k1, k2 = 1.2, 0.4` | the rules card |
+| 3. The model | `def rhs(t, y): ...` | the rules themselves |
+| 4. Integrate | `solve_ivp(rhs, (0, 10), y0)` | playing the turns |
+| 5. Plot | `plt.plot(sol.t, sol.y[0])` | drawing the graph |
+
+Two code sketches walked through live: the **closed** system
+(`dA/dt = -v, dB/dt = +v` with `v = k1*A - k2*B`) and the **open** one
+(`dA/dt = k0 - k1*A, dB/dt = k1*A - k2*B`) — predict, before running, whether
+`[A]+[B]` will be flat this time, then check the steady values analytically
+(`A_ss = k0/k1`, `B_ss = k0/k2`) against the plot.
+
+**What the solver is really doing.** Euler's method is the whole algorithm
+in three lines: `y = y + dt*dy` inside a loop over fixed steps. That loop
+*is* last week's game — one pass is one turn, `dt` is one generation, `dy` is
+the rules card. Run it at `dt = 0.5, 0.1, 0.01` and overlay against
+`solve_ivp` to see it converge.
+
+**The five errors you will hit:**
+
+| Symptom | Almost always |
+|---|---|
+| The curve is a flat line at zero | You returned the new values instead of the derivatives |
+| Concentrations go negative | A sign error in the rhs, or a step size far too large |
+| "could not broadcast" / shape error | `rhs` returned a list of the wrong length |
+| The total drifts in a closed system | The two derivatives are not exact negatives |
+| It runs forever | A stiff system — pass `method='Radau'` or `'BDF'` |
+
+Read the last line of the traceback first, not the first — it's the one that
+names your own function.
+
+## Today's notebook
+
+Open **`M02_simple_ODE_models.ipynb`** on Colab (`bimb265125.matinnu.org` →
+Meeting 02 → "Open in Colab"; *File → Save a copy in Drive* first) and work
+through it directly — it's reproduced below.
+
+1. Run the closed system. Verify `[A]+[B]` is constant to `1e-6`.
+2. Run the open system. Compare the steady values with `k₀/k₁` and `k₀/k₂`.
+3. Euler with `dt = 0.5, 0.1, 0.01` against `solve_ivp`.
+4. Tune the Lotka–Volterra parameters to your own tally sheet; 150-word
+   write-up.
+
+Before you submit: *Runtime → Restart and run all* must complete with no
+errors. Hand in the completed `.ipynb` in `M02_ode/notebooks/`, the four
+figures in `M02_ode/figures/`, and your journal entry, before Friday 25
+September.
+
+[Download the blank notebook template (.ipynb)](../M02_simple_ODE_models.ipynb) —
+open it on Colab to fill it in; it is not rendered here because it is a
+fill-in-the-blank template, not a finished, runnable document.
+
+Next meeting: Python for simulating biological systems — data structures,
+visualisation, and numerical integration in more depth, building directly on
+today's notebook.
