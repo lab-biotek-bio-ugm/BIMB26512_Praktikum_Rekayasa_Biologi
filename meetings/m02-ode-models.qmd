@@ -159,9 +159,10 @@ names your own function.
 
 ## Today's notebook
 
-Open **`M02_simple_ODE_models.ipynb`** on Colab (`bimb265125.matinnu.org` →
-Meeting 02 → "Open in Colab"; *File → Save a copy in Drive* first) and work
-through it directly — it's reproduced below.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lab-biotek-bio-ugm/BIMB26512_Praktikum_Rekayasa_Biologi/blob/main/notebooks/M02_simple_ODE_models.ipynb)
+
+Open **`M02_simple_ODE_models.ipynb`** on Colab with the button above
+(*File → Save a copy in Drive* first) and work through it directly.
 
 1. Run the closed system. Verify `[A]+[B]` is constant to `1e-6`.
 2. Run the open system. Compare the steady values with `k₀/k₁` and `k₀/k₂`.
@@ -174,7 +175,7 @@ errors. Hand in the completed `.ipynb` in `M02_ode/notebooks/`, the four
 figures in `M02_ode/figures/`, and your journal entry, before Friday 25
 September.
 
-[Download the blank notebook template (.ipynb)](../M02_simple_ODE_models.ipynb) —
+[Download the blank notebook template (.ipynb)](../notebooks/M02_simple_ODE_models.ipynb) —
 open it on Colab to fill it in; it is not rendered here because it is a
 fill-in-the-blank template, not a finished, runnable document.
 

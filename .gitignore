@@ -4,3 +4,6 @@
 **/*.quarto_ipynb
 **/*.pptx
 **/*.docx
+
+# instructor solutions: never push (Colab serves main to students)
+/instructor/

@@ -17,7 +17,8 @@ resources:
   - P01_Introduction_to_Computational_Applications_in_Bioengineering.pptx
   - P02_Modelling_Biological_Systems_with_Simple_Differential_Equations.pptx
   - fox-rabbit-sim/dist/index.html
-  - M02_simple_ODE_models.ipynb
+  - notebooks/M02_simple_ODE_models.ipynb
+  - notebooks/M03_michaelis_menten.ipynb
 
 format:
   html:
